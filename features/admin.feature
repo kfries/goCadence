@@ -5,4 +5,4 @@ Feature: Administrative Tests
 
   Scenario: Check lib Version
     When I call the version method
-    Then it will return "0.0.2"
+    Then it will return "0.0.3"

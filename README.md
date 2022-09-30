@@ -35,9 +35,25 @@ Go module focused on recurring time periods
 ## CadenceObj
 
    * **Properties:**
+      * **String:** A printable version of the cadence name
+         * **Example** BIWEEKLY.String() -> "bi-weekly"
+      * **Description:** a description of the cadence
+        * **Example:** BIWEEKLY.Description() -> "every two weeks"
    * **Methods:**
       * **TimesIn(cad CadenceObj)** -> *float64*
          * **Parameters:** Cadence Object
          * **Return:** *float64*
          * A method to return the nunber of times the cadence will exist with the given cadence
             * Example -> A cadence of Semi-Annually will occur 2.0 times in a cadence of Annually
+
+## Misc. Notes
+
+   * Cadence of SEMIMONTHLY currently defaults to the 15th and the last day of the month
+
+## Future Features
+
+   * Setting to disallow Saturdays
+   * Setting to disallow Sundays
+   * Setting to disallow Holidays
+   * Allow dates to be advanced to next day when disallowed
+   * Allow dates to be pushed backward to previous day when disallowed

@@ -3,10 +3,11 @@ package goCadence
 import (
 	"errors"
 	"strings"
+	"time"
 )
 
 const (
-	appVersion string = "0.0.2"
+	appVersion string = "0.0.3"
 )
 
 type CadenceEngine struct {
@@ -42,8 +43,62 @@ func (co *CadenceObj) TimesIn(secondCo CadenceObj) (ans float64, err error) {
 	return
 }
 
-type CadenceInf interface {
-	TimesIn() float64
+func (co *CadenceObj) Next(baseDate time.Time) (newDate time.Time, err error) {
+	switch co.Key {
+	case "ANNUALLY":
+		newDate = baseDate.AddDate(1, 0, 0)
+	case "BIANNUALLY":
+		newDate = baseDate.AddDate(2, 0, 0)
+	case "BIMONTHLY":
+		newDate = baseDate.AddDate(0, 2, 0)
+	case "BIWEEKLY":
+		newDate = baseDate.AddDate(0, 0, 14)
+	case "DAILY":
+		newDate = baseDate.AddDate(0, 0, 1)
+	case "MONTHLY":
+		newDate = baseDate.AddDate(0, 1, 0)
+	case "ONCE":
+		newDate = baseDate
+	case "QUADWEEKLY":
+		newDate = baseDate.AddDate(0, 0, 28)
+	case "QUARTERLY":
+		newDate = baseDate.AddDate(0, 3, 0)
+	case "SEMIANNUALLY":
+		newDate = baseDate.AddDate(0, 6, 0)
+	case "SEMIMONTHLY":
+		m := baseDate.Month()
+		d := baseDate.Day()
+		y := baseDate.Year()
+
+		if d >= 15 {
+			newDate = time.Date(y, m+1, 0, 0, 0, 0, 0, time.UTC)
+		} else {
+			newDate = time.Date(y, m, 15, 0, 0, 0, 0, time.UTC)
+		}
+
+		if newDate == baseDate {
+			newDate = time.Date(y, m+1, 15, 0, 0, 0, 0, time.UTC)
+		}
+	case "TREANNUALLY":
+		newDate = baseDate.AddDate(3, 0, 0)
+	case "TREQUADWEEKLY":
+		newDate = baseDate.AddDate(0, 0, 84)
+	case "TRIANNUALLY":
+		newDate = baseDate.AddDate(0, 4, 0)
+	case "WEEKLY":
+		newDate = baseDate.AddDate(0, 0, 7)
+	}
+
+	return
+}
+
+func (co *CadenceObj) NextN(baseDate time.Time, idx int) (newDate time.Time, err error) {
+	newDate = baseDate
+	for i := 0; i < idx; i++ {
+		newDate, err = co.Next(newDate)
+	}
+
+	return
 }
 
 var (

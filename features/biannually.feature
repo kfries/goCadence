@@ -6,6 +6,7 @@ Feature: Daily Cadence Object
 
   Background:
     Given a new BIANNUALLY cadence object
+    And the date is 2022-04-04
 
   Scenario: Verify its weighting value
     Then its value whould be 42
@@ -25,3 +26,11 @@ Feature: Daily Cadence Object
     Given a second cadence of TREANNUALLY
     When I ask how many times it is in this second cadence
     Then I should get a floating point value of 1.500000
+
+  Scenario: What is the next date given our test date?
+    When I call the next function with the test date
+    Then i should get a date of 2024-04-04
+
+  Scenario: What is the 3rd date given our test date?
+    When I request the third occurance from the test date
+    Then i should get a date of 2028-04-04

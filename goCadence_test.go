@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"testing"
+	"time"
 
 	"github.com/cucumber/godog"
 )
@@ -13,6 +14,8 @@ type testData struct {
 	cad1, cad2     CadenceObj
 	str1, str2     string
 	float1, float2 float64
+	testDate       time.Time
+	nextDate       time.Time
 }
 
 func TestCucumberFeatures(t *testing.T) {
@@ -43,6 +46,12 @@ func (td *testData) aSecondCadenceObject(key string) (err error) {
 	return
 }
 
+func (td *testData) theDateIs(year, month, day int) (err error) {
+	td.testDate = time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+
+	return
+}
+
 // When Callbacks
 func (td *testData) iCallTheVersionMethod() (err error) {
 	td.str1 = Cadence.Version
@@ -52,6 +61,18 @@ func (td *testData) iCallTheVersionMethod() (err error) {
 
 func (td *testData) howManyTimesIn() (err error) {
 	td.float1, err = td.cad1.TimesIn(td.cad2)
+
+	return
+}
+
+func (td *testData) whenICallNext() (err error) {
+	td.nextDate, err = td.cad1.Next(td.testDate)
+
+	return
+}
+
+func (td *testData) whenICallNext3() (err error) {
+	td.nextDate, err = td.cad1.NextN(td.testDate, 3)
 
 	return
 }
@@ -103,16 +124,30 @@ func (td *testData) testFloatValue(expected float64) (err error) {
 	return
 }
 
+func (td *testData) verifyDate(year, month, day int) (err error) {
+	expected := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+	if td.nextDate != expected {
+		dateFormat := time.RFC822
+		errText := fmt.Sprintf("ERROR: goCadence: Invalid Value: got: %s, exp:%s", td.nextDate.Format(dateFormat), expected.Format(dateFormat))
+		err = errors.New(errText)
+	}
+
+	return
+}
+
 func InitializeScenario(sc *godog.ScenarioContext) {
 	td := testData{}
 
 	// Given Mappings
 	sc.Step(`^a new (.*) cadence object$`, td.aNewCadenceObject)
 	sc.Step(`^a second cadence of (.*)$`, td.aSecondCadenceObject)
+	sc.Step(`^the date is (\d+)-(\d+)-(\d+)$`, td.theDateIs)
 
 	// When Mappings
 	sc.Step(`^I call the version method$`, td.iCallTheVersionMethod)
 	sc.Step(`^I ask how many times it is in this second cadence$`, td.howManyTimesIn)
+	sc.Step(`^I call the next function with the test date$`, td.whenICallNext)
+	sc.Step(`^I request the third occurance from the test date$`, td.whenICallNext3)
 
 	// Then Mappings
 	sc.Step(`^it will return "([^"]*)"$`, td.itWillReturn)
@@ -120,4 +155,5 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Step(`^its string value should be "([^"]*)"$`, td.verifyString)
 	sc.Step(`^its value whould be (\d+)$`, td.verifyValue)
 	sc.Step(`^I should get a floating point value of (\d+\.\d+)$`, td.testFloatValue)
+	sc.Step(`^i should get a date of (\d+)-(\d+)-(\d+)$`, td.verifyDate)
 }
