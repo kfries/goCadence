@@ -1,4 +1,4 @@
-module com.thefrieses.kevin.goCadence
+module github.com/kfries.goCadence
 
 go 1.19
 
